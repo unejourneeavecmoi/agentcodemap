@@ -7,8 +7,19 @@ ways of working, measured on real projects with real command output.
         overview only when orienting, never the full index
 
 Nothing is sent to a model. Token counts are tiktoken cl100k_base on the exact text an agent
-would receive. Run:  python cost_rule_benchmark.py <project> [<project> ...]
-Writes cost_rule_report.html and cost_rule_report.md next to this script.
+would receive.
+
+Run:  python cost_rule_benchmark.py [--tokenizer NAME] <project> [<project> ...]
+
+--tokenizer picks how tokens are counted (default cl100k_base):
+  cl100k_base | o200k_base   tiktoken encodings (pip install tiktoken). cl100k is the
+                             usual proxy for Claude, whose tokenizer is not public.
+  hf:<repo>                  any Hugging Face tokenizer (pip install transformers), e.g.
+                             hf:deepseek-ai/DeepSeek-V3  hf:zai-org/GLM-4.5  hf:Qwen/Qwen3-8B
+  chars4                     no dependencies: characters / 4, a rough estimate
+
+Writes cost_rule_report[_<tag>].md and .html next to this script; the tag is the
+tokenizer name when it is not the default.
 """
 import html
 import importlib.util
@@ -19,18 +30,35 @@ import re
 import subprocess
 import sys
 
-import tiktoken
-
 HERE = os.path.dirname(os.path.abspath(__file__))
-spec = importlib.util.spec_from_file_location("codemap", os.path.join(HERE, "codemap.py"))
+CODEMAP = os.path.join(HERE, "codemap.py")   # the tool beside this script; projects need no copy
+spec = importlib.util.spec_from_file_location("codemap", CODEMAP)
 cm = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(cm)
 
-enc = tiktoken.get_encoding("cl100k_base")
+TOKENIZER = "cl100k_base"
+_count = None
+
+
+def make_counter(name):
+    """Return (label, function text -> token count) for a tokenizer name."""
+    if name == "chars4":
+        return "characters / 4 (estimate)", lambda s: (len(s) + 3) // 4
+    if name.startswith("hf:"):
+        from transformers import AutoTokenizer  # pip install transformers
+        repo = name[3:]
+        t = AutoTokenizer.from_pretrained(repo, trust_remote_code=True)
+        return f"Hugging Face tokenizer {repo}", lambda s: len(t.encode(s, add_special_tokens=False))
+    import tiktoken  # pip install tiktoken
+    enc = tiktoken.get_encoding(name)
+    return f"tiktoken {name}", lambda s: len(enc.encode(s, disallowed_special=()))
 
 
 def tok(s):
-    return len(enc.encode(s or "", disallowed_special=()))
+    global _count
+    if _count is None:
+        _count = make_counter(TOKENIZER)[1]
+    return _count(s or "")
 
 
 GREP_LINE_CAP = 250      # the Grep tool returns at most 250 lines by default
@@ -89,7 +117,7 @@ def grep(proj, needle, files):
 
 
 def cmd(proj, *args):
-    r = subprocess.run([sys.executable, "codemap.py", *args], cwd=proj, capture_output=True,
+    r = subprocess.run([sys.executable, CODEMAP, *args], cwd=proj, capture_output=True,
                        text=True, encoding="utf-8", errors="replace")
     return r.stdout
 
@@ -112,7 +140,7 @@ def bench(proj):
     proj = os.path.abspath(proj)
     name = os.path.basename(proj)
     out = os.path.join(proj, cm.OUT_DIR)
-    subprocess.run([sys.executable, "codemap.py", "."], cwd=proj, capture_output=True)
+    subprocess.run([sys.executable, CODEMAP, "."], cwd=proj, capture_output=True)
     graph = json.load(io.open(os.path.join(out, "map.json"), encoding="utf-8"))
     nodes = graph["nodes"]
     overview = read(os.path.join(out, "CODE_MAP.md"))
@@ -231,8 +259,9 @@ def saving(rule, other):
 
 
 def md_report(results):
+    label = make_counter(TOKENIZER)[0]
     L = ["# Cost rule benchmark", "",
-         "Tokens an agent ingests per lookup task (tiktoken cl100k_base on real command output and file text). "
+         f"Tokens an agent ingests per lookup task ({label}, on real command output and file text). "
          "No model calls. OLD = read the whole map first (previous AGENTS.md wording). GREP = no map. "
          "RULE = the cost rule.", ""]
     for r in results:
@@ -307,13 +336,27 @@ def inline(s):
 
 
 def main():
-    projects = sys.argv[1:]
+    global TOKENIZER
+    args = sys.argv[1:]
+    if "--tokenizer" in args:
+        i = args.index("--tokenizer")
+        if i + 1 >= len(args):
+            print(__doc__); sys.exit(1)
+        TOKENIZER = args[i + 1]
+        del args[i:i + 2]
+    projects = args
     if not projects:
         print(__doc__); sys.exit(1)
+    try:
+        make_counter(TOKENIZER)
+    except Exception as e:  # missing package or unknown name: say so before the long run
+        sys.stderr.write(f"Cannot load tokenizer '{TOKENIZER}': {e}\n")
+        sys.exit(2)
     results = [bench(p) for p in projects]
     md = md_report(results)
-    io.open(os.path.join(HERE, "cost_rule_report.md"), "w", encoding="utf-8", newline="\n").write(md)
-    io.open(os.path.join(HERE, "cost_rule_report.html"), "w", encoding="utf-8", newline="\n").write(html_report(md))
+    tag = "" if TOKENIZER == "cl100k_base" else "_" + re.sub(r"[^A-Za-z0-9.-]+", "-", TOKENIZER.replace("hf:", ""))
+    io.open(os.path.join(HERE, f"cost_rule_report{tag}.md"), "w", encoding="utf-8", newline="\n").write(md)
+    io.open(os.path.join(HERE, f"cost_rule_report{tag}.html"), "w", encoding="utf-8", newline="\n").write(html_report(md))
     print(md)
 
 

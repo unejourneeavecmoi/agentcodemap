@@ -78,6 +78,24 @@ pip install tiktoken
 python cost_rule_benchmark.py <project> [<project> ...]
 ```
 
+The default counter is tiktoken `cl100k_base`, the usual proxy for Claude.
+To count with another model's tokenizer, so the numbers match what GLM,
+DeepSeek, Qwen or any Hugging Face model would actually ingest:
+
+```
+pip install transformers
+python cost_rule_benchmark.py --tokenizer hf:deepseek-ai/DeepSeek-V3 <project>
+python cost_rule_benchmark.py --tokenizer hf:zai-org/GLM-4.5 <project>
+python cost_rule_benchmark.py --tokenizer o200k_base <project>      # OpenAI GPT-4o family
+python cost_rule_benchmark.py --tokenizer chars4 <project>          # no dependencies, rough
+```
+
+Each run writes `cost_rule_report_<tokenizer>.md` and `.html`. Absolute counts
+shift by roughly 10–20% between tokenizers; the savings ratios do not. The
+benchmark measures what text an agent receives, not whether a given agent
+follows the `AGENTS.md` rule. Test that live, per agent, before quoting the
+numbers for it.
+
 ---
 
 ## What gets written
