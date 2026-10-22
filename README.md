@@ -1,27 +1,133 @@
-# Agent Code Map
+<a href="https://agentcodemap.com"><img src="https://agentcodemap.com/assets/readme-hero.jpg" alt="Agent Code Map: Your AI reads too much. Give it a map." width="100%"></a>
 
-A token-saving code map for AI coding agents. One Python file, no dependencies,
-no LLM, no network. It parses a codebase locally and writes a small map that
-agents query instead of grepping and reading files whole.
+<p align="center">
+  <a href="https://agentcodemap.com"><img src="https://img.shields.io/badge/agentcodemap.com-2a5fe0?style=for-the-badge&logoColor=white" alt="Website"></a>
+  <a href="codemap.py"><img src="https://img.shields.io/badge/one%20file-codemap.py-3f73f5?style=for-the-badge" alt="One file"></a>
+  <a href="codemap.py"><img src="https://img.shields.io/badge/python-3.8%2B-2f6b3c?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.8+"></a>
+  <a href="codemap.py"><img src="https://img.shields.io/badge/dependencies-none-8db0ff?style=for-the-badge" alt="Zero dependencies"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-555?style=for-the-badge" alt="Apache-2.0"></a>
+  <a href="https://buymeacoffee.com/losingnumbers"><img src="https://img.shields.io/badge/buy%20me%20a%20coffee-%E2%98%95-ffdd00?style=for-the-badge&logoColor=black" alt="Buy me a coffee"></a>
+</p>
 
-Measured on four real projects: **68–97% fewer tokens per lookup session** than
-exploring with grep, and 33–59% fewer than reading a full map first. Details
-and method in [cost_rule_report.md](cost_rule_report.md).
+# Your AI reads too much. Give it a map.
 
-Website: [agentcodemap.com](https://agentcodemap.com) · Author: [@biggab123](https://x.com/biggab123)
+Put **one file** in your project folder and type **one line**. From then on
+your coding AI reads a small map of your code instead of whole files. Same
+answers, up to **97% less reading**, and a smaller bill every month.
 
----
+Free. Works with Claude Code, Codex, Cursor and opencode. Nothing leaves your
+computer.
 
-## Quick start
+## Three steps. The first two take a minute.
+
+**1. Put one file in your folder.**
+Download [`codemap.py`](codemap.py) and drop it into the folder your project
+lives in. That is the entire install. No account, no packages.
+
+**2. Type one line.**
 
 ```
-copy codemap.py into the project folder
 python codemap.py .
 ```
 
-That builds `codemap-out/` and writes (or patches) an `AGENTS.md` in the
-project root, so Claude Code, Codex, Cursor, opencode and any other agent that
-reads `AGENTS.md` is told how to use the map. From then on:
+About a second later there is a small map of your code: what is in each file,
+and which function calls which. It redraws itself whenever your code changes.
+
+**3. Your AI reads the map, not the whole book.**
+Claude Code, Codex, Cursor and opencode should find the map by themselves, or
+just tell them to read and execute `AGENTS.md`, which is created in the root
+folder.
+
+## A map is a lot smaller than the book.
+
+AI companies charge for every word the AI reads, counted in tokens. Fewer
+tokens read, smaller bill. One real question, answered two ways, on a 228-file
+app:
+
+> *"What is in `app.js`?"* (a 7,000-line file)
+
+| | Tokens read |
+|---|---:|
+| Without the map: the AI opens the whole file | **104,625** |
+| With the map: one line per function, with its line number | **4,091** |
+
+![One question, two answers](https://agentcodemap.com/assets/chart-one-file.svg)
+
+Another one: *"How is `readFrontmatter` connected to `match`?"* Without the
+map the AI reads two whole files, 135,769 tokens. The map answers in 16:
+
+```
+$ python codemap.py path readFrontmatter match
+Shortest path (1 hops):
+  readFrontmatter --calls--> match
+```
+
+## What it saved on four real projects.
+
+One normal working session each: find a thing, see who uses it, look inside a
+file, connect two functions. Same questions, with and without the map.
+
+![Tokens per session on four projects](https://agentcodemap.com/assets/chart-session-tokens.svg)
+
+| Project | Files | Without the map | With the map | Saving |
+|---|---:|---:|---:|---:|
+| Electron app | 228 | 267,525 | 8,349 | **97%** |
+| React app | 26 | 80,649 | 4,107 | **95%** |
+| PHP site | 45 | 17,773 | 4,026 | **77%** |
+| PHP/JS web app | 133 | 38,780 | 12,262 | **68%** |
+
+The saving is the same on every model. The same 133-file project counted with
+four tokenizers saves 68 to 69 percent each time; only the price per token
+differs.
+
+![Same project, four tokenizers](https://agentcodemap.com/assets/chart-same-saving.svg)
+
+## Your bill, roughly.
+
+What one session of six lookups costs at each model's list price for input,
+without the map and with it. Try your own numbers with the calculator on
+[agentcodemap.com](https://agentcodemap.com/#bill).
+
+![What one session costs per model](https://agentcodemap.com/assets/chart-dollars.svg)
+
+| Model | Input price, per 1M | Session, no map | Session, with map | Saving |
+|---|---:|---:|---:|---:|
+| Claude Fable 5.1 | $10.00 | 38,780 | 12,262 | 68% |
+| GPT-6 Astra | $10.00 | 39,823 | 12,337 | 69% |
+| GLM-5.3 | $1.40 | 38,801 | 12,403 | 68% |
+| DeepSeek V4 Pro | $1.32 peak | 41,978 | 13,193 | 69% |
+
+Prices, sources and the dates they were checked are listed on
+[agentcodemap.com](https://agentcodemap.com/#bill). Dollar figures are tokens
+read times the list price for input, nothing else.
+
+## Questions people ask.
+
+**Does it send my code anywhere?**
+No. It is one Python file with no dependencies, no AI inside it and no
+network calls. You can read the whole file before you run it.
+
+**What does it write?**
+A `codemap-out/` folder with a two-page overview (`CODE_MAP.md`), an index of
+every function with its line number (`CODE_MAP_INDEX.md`), the graph the
+commands query (`map.json`), and a short note in your `AGENTS.md`. Commit the
+folder or ignore it; both work.
+
+**Which languages and which AIs?**
+Python, JavaScript, TypeScript, PHP, SQL and HTML properly; Java, C#, Go,
+Ruby, Rust, C and C++ at a lighter level. Any AI that reads `AGENTS.md`.
+
+**Does the map go stale?**
+No. Every time it is asked something it checks which files changed and redraws
+only those, usually in well under a second.
+
+**Where does it not help?**
+Searching for a literal piece of text still goes through normal search; the
+map does not store text. Tiny projects under about 30 files save little. One
+flat scraper script in the benchmark saved only 28 percent. The map pays most
+where files are big and connected.
+
+## The four questions your AI will ask the map
 
 ```
 python codemap.py query "auth"        what exists for a topic, with call edges
@@ -30,167 +136,16 @@ python codemap.py file acp-composer   one file's symbols with line numbers
 python codemap.py path main slugify   shortest chain between two symbols
 ```
 
-Every read command checks file hashes first and rebuilds the map if code
-changed, so it is never stale. Rebuilds are incremental and take well under a
-second on a mid-sized project.
-
-Supports Python (real AST), JavaScript/TypeScript, PHP, SQL, HTML, plus
-regex-level extraction for Java, C#, Go, Ruby, Rust, C/C++ and others.
-
----
-
-## Why it saves tokens
-
-An agent exploring by grep reads whole files to understand them. A 7,000-line
-`app.js` is about 100k tokens. The map answers the same questions in a few
-hundred tokens:
-
-| Looking for | Cheapest move | Typical size |
-|---|---|---|
-| A function, class, file or concept | `python codemap.py query "<term>"` | ~1 KB, with call edges |
-| One file's shape | `python codemap.py file <path-part>` | a few hundred bytes |
-| Who calls / inherits what | `explain <Name>`, `path <A> <B>` | ~1 KB |
-| A literal string (UI label, error text, config key) | plain grep, the map does not index text | ~300 bytes |
-| The big picture | read `codemap-out/CODE_MAP.md` whole | under 10 KB |
-| Never | read `codemap-out/CODE_MAP_INDEX.md` whole | 50 KB+ on a mid-sized project |
-
-This cost rule is what the generated `AGENTS.md` section tells agents. Two
-honest caveats from the benchmark: a name that is unique in the codebase is a
-little cheaper to grep than to query, and on a very small project (under about
-30 files) reading the overview whole is already cheap.
-
-### Benchmark
-
-Tokens an agent ingests across six typical lookup tasks in one session, counted
-with tiktoken on real command output and file text. No model calls.
-
-| Project | Read whole map first | Grep only | Cost rule |
-|---|---:|---:|---:|
-| Electron app, 228 files | 20,442 | 267,525 | 8,349 |
-| PHP/JS web app, 133 files | 18,781 | 38,780 | 12,262 |
-| PHP site, 45 files | 5,973 | 17,773 | 4,026 |
-| React app, 26 files | 3,508 | 80,649 | 4,107 |
-
-Reproduce on your own projects:
-
-```
-pip install tiktoken
-python cost_rule_benchmark.py <project> [<project> ...]
-```
-
-The default counter is tiktoken `cl100k_base`, the usual proxy for Claude.
-To count with another model's tokenizer, so the numbers match what GLM,
-DeepSeek, Qwen or any Hugging Face model would actually ingest:
-
-```
-pip install transformers
-python cost_rule_benchmark.py --tokenizer hf:deepseek-ai/DeepSeek-V3 <project>
-python cost_rule_benchmark.py --tokenizer hf:zai-org/GLM-4.5 <project>
-python cost_rule_benchmark.py --tokenizer o200k_base <project>      # OpenAI GPT-4o family
-python cost_rule_benchmark.py --tokenizer chars4 <project>          # no dependencies, rough
-```
-
-Each run writes `cost_rule_report_<tokenizer>.md` and `.html`. Absolute counts
-shift by roughly 10–20% between tokenizers; the savings ratios do not. The
-benchmark measures what text an agent receives, not whether a given agent
-follows the `AGENTS.md` rule. Test that live, per agent, before quoting the
-numbers for it.
-
----
-
-## What gets written
-
-| File | What it is |
-|---|---|
-| `codemap-out/CODE_MAP.md` | Short overview (under ~10 KB): hubs, HTTP routes, DB schema, modules by directory, where to look next. Safe for an agent to read whole |
-| `codemap-out/CODE_MAP_INDEX.md` | The big part: per-file symbol index with line numbers and cross-file edges. Agents grep it or use `file`/`query`, never read it whole |
-| `codemap-out/map.json` | The full graph (nodes, edges, per-file cache) used by the query commands |
-| `codemap-out/AGENTS_MAP.md` | Short instructions for agents on how to use the map |
-| `AGENTS.md` (project root) | A section between `<!-- codemap:start -->` and `<!-- codemap:end -->` markers, refreshed on every build |
-
-Add `codemap-out/` to `.gitignore` if you want the map always local-fresh, or
-commit it to ship a map with the repo.
-
----
-
-## Commands
-
-### `query "term"` — find nodes and their connections
-
-Free-text search across the whole graph: symbol names (partial matches too),
-file paths, HTTP routes, DOM element ids and DB table names. Each hit shows its
-kind, `file:line` and up to 8 connections, tagged `EXTRACTED` (explicit in
-source) or `INFERRED` (resolved by codemap). Exit code `4` means no matches.
-
-```
-$ python codemap.py query "account"
-Matches for 'account': 11
-  #accountSwitcher (element) app/views/layout.php:56 - 0 connections
-  /api/accounts (route) httpdocs/index.php:185 - 0 connections
-  accounts (table) migrations/001_accounts.sql:5 - 0 connections
-```
-
-### `explain <Name>` — one symbol in detail
-
-Exact name or unique partial match. Prints kind, location, degree and up to 50
-connections sorted by edge type. Exit `3` = ambiguous (candidates listed),
-`4` = no such node.
-
-```
-$ python codemap.py explain Admin
-Node: Admin
-  Kind:       class
-  Location:   app.py:13
-  Degree:     2
-Connections (2):
-  --> main [calls] [EXTRACTED]
-  --| User [inherits] [EXTRACTED]
-```
-
-### `file <path-part>` — one file's symbols
-
-Every symbol in one file with kind and line number. Any fragment of the path
-works; if it matches more than one file the candidates are listed (exit `3`).
-
-```
-$ python codemap.py file acp-composer
-src/renderer/acp-composer.mjs [javascript] - 10 symbols
-     11  function  esc
-     13  function  createComposer
-     49  function  grow
-```
-
-### `path <A> <B>` — shortest connection
-
-Breadth-first search, printed hop by hop. Language builtins are excluded as
-intermediate hops. Node ids like `file:src/app.py` work too.
-
-```
-$ python codemap.py path main slugify
-Shortest path (2 hops):
-  main --calls--> Admin.promote --calls--> slugify
-```
-
-### `stats`, `check`, `watch`, `hook`
+And a few more for you:
 
 ```
 python codemap.py stats               files / symbols / edges summary
 python codemap.py check               freshness test, no rebuild (exit 1 = stale)
 python codemap.py watch [seconds]     keep the map live in the background
-python codemap.py hook install        git post-commit / post-merge / post-checkout hooks
-python codemap.py hook uninstall      remove them
+python codemap.py hook install        git hooks that rebuild after commit, merge, checkout
 ```
 
-`watch` and the git hooks also keep `CODE_MAP.md` itself fresh, which covers
-the one case self-healing cannot: an agent reading the file directly instead
-of using the commands.
-
----
-
-## Using it with Claude Code everywhere
-
-Each project gets its own `AGENTS.md` section automatically. To carry the cost
-rule into every project without per-project setup, put this in
+To carry the habit into every project with Claude Code, add this to your
 `~/.claude/CLAUDE.md`:
 
 ```markdown
@@ -200,23 +155,20 @@ rule into every project without per-project setup, put this in
   then `explain <Name>`, `path <A> <B>`, or `file <path-part>`. Only then open
   the lines it points to.
 - Literal string (UI label, error text, config key): grep directly.
-- `codemap-out/CODE_MAP.md` is fine to read whole. `CODE_MAP_INDEX.md` is not:
-  grep it or use the commands.
-- Under about 30 files, reading `CODE_MAP.md` whole is already cheap.
+- `codemap-out/CODE_MAP.md` is fine to read whole. `CODE_MAP_INDEX.md` is not.
 - Rebuild by hand only after big changes: `python codemap.py .`
 ```
 
----
+## Behind the numbers
 
-## Skipped automatically
+Everything above was counted on real command output and file text with each
+model's tokenizer, with no AI calls. The method and the per-task tables are in
+[`benchmark/cost_rule_report.md`](benchmark/cost_rule_report.md).
 
-`codemap.py` itself, `node_modules`, `vendor`, `.git`, `dist`, `build`,
-`codemap-out`, binary and image files, and anything over 2 MB per file.
-
----
+The charts above are served from [agentcodemap.com](https://agentcodemap.com).
 
 ## License
 
-Apache License 2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE). If you build
-on this, keep the NOTICE file with your distribution and a link back to
-[agentcodemap.com](https://agentcodemap.com) is appreciated.
+Apache License 2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE). If it trims
+your bill, [buy me a coffee](https://buymeacoffee.com/losingnumbers).
+Made by [@biggab123](https://x.com/biggab123).
